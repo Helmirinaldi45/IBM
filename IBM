@@ -1,0 +1,433 @@
+from __future__ import annotations
+from __future__ import annotations
+
+from enum import Enum, auto
+
+from PySide6.QtMultimediaWidgets import QVideoWidget
+from PySide6.QtMultimedia import (QCapturableWindow, QMediaCaptureSession,
+                                  QScreenCapture, QWindowCapture)
+from PySide6.QtWidgets import (QGridLayout, QLabel, QListView,
+                               QMessageBox, QPushButton, QWidget)
+from PySide6.QtGui import QAction, QGuiApplication
+from PySide6.QtCore import QItemSelection, Qt, Slot
+from PySide6.QtWidgets import QApplication, QWidget
+from PySide6.QtCore import Qt, QRect, QPoint
+import base64
+from langchain_ibm import ChatWatsonx
+from langchain_core.messages import HumanMessage, SystemMessage
+from ibm_watsonx_ai.metanames import GenTextParamsMetaNames as GenParams
+from io import BytesIO
+from PIL.ImageFile import ImageFile
+from dotenv import load_dotenv
+from PySide6.QtGui import QPainter, QColor, QGuiApplication, QPixmap, QScreen
+import os
+import sys
+import time
+import cv2.data
+import rpa as robot
+import PyInstaller
+from PySide6.QtTextToSpeech import QTextToSpeech
+import cv2
+from ibm_watsonx_ai.foundation_models import ModelInference
+from ibm_watsonx_ai.metanames import GenTextParamsMetaNames as GenParams
+from ibm_watsonx_ai.foundation_models.utils.enums import ModelTypes, DecodingMethods
+from ibm_watsonx_ai import Credentials
+from ibm_watsonx_ai.foundation_models.extractions import TextExtractions
+from PySide6.QtCore import Qt, QThread, Signal, Slot
+from PySide6.QtGui import QAction, QImage, QKeySequence, QPixmap
+from PySide6.QtCore import Qt
+import easyocr as reader
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QLabel, QWidget, QPushButton, QVBoxLayout, QHBoxLayout,
+    QComboBox, QGroupBox, QMenuBar, QMenu, QSizePolicy, QFileDialog, QTextEdit
+)
+from PySide6.QtGui import QPixmap, QImage, QPalette, QLinearGradient, QColor, QBrush, QKeySequence
+from PySide6.QtCore import Qt, Slot, QThread, Signal
+from PySide6.QtCharts import QChart, QChartView, QBarSeries
+from PySide6.QtMultimedia import QMediaDevices, QAudioInput, QAudio, QAudioSource, QCapturableWindow
+import mediapipe as pipe
+import speech_recognition as rekam
+from PySide6.QtCore import QFile, QIODevice, QMimeData, QPoint, Qt, QTextStream
+from PySide6.QtGui import QDrag, QPalette, QPixmap
+from PySide6.QtWidgets import QApplication, QFrame, QLabel, QWidget
+import pyttsx3 
+#PROBLEM STATEMENT
+#FIRST IS THIS SOLUSTION IS BASED FOR MAKING PEOPLE MAKE IT EASIER CODING AND AFTER AI JOBS,BECAUSE FROM BILL GATES STATEMENT HIS SAY THE JOBS AFTER AI IS PROGRAMMING,BIOLOGIST SCIENTIST AND ENERGY EXPERT AND THEN THROUGH THIS TOOL OUR TEAM IS HOPE FOR USER CAN MAKE IT EASY LEARN,WORK AND USE THERE JOBS
+#HELMI ENTAR GUNAKAN SOLUSI LOGIKA BOOLEAN YA DI TIAP KOMPONEN APLIKASI
+
+class Window(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Bob")
+        self.setGeometry(100, 100, 1080, 720)
+        palette = QPalette()
+        gradient = QLinearGradient(0, 3, 0, 720)
+        gradient.setColorAt(0.0, QColor("#87CEFA"))  # Light blue
+        gradient.setColorAt(1.0, QColor("#FFFFFF"))  # White
+        palette.setBrush(QPalette.Window, QBrush(gradient))
+        self.setAutoFillBackground(True)
+        self.setPalette(palette)
+
+        # Menu
+        menu_bar = self.menuBar()
+        menu_file = menu_bar.addMenu("File")
+        exit_action = QAction("Exit", self)
+        exit_action.triggered.connect(QApplication.quit)
+        menu_file.addAction(exit_action)
+
+        menu_about = menu_bar.addMenu("&About")
+        about_qt = QAction("About Qt", self)
+        about_qt.setShortcut(QKeySequence.StandardKey.HelpContents)
+        about_qt.triggered.connect(QApplication.aboutQt)
+        menu_about.addAction(about_qt)
+
+        self.label = QTextEdit(self)  # untuk visual gambar
+        self.label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.label.setStyleSheet("color: black; background-color: lightyellow;")
+
+        self.label1 = QTextEdit(self)  # untuk visual hasil deskripsi ai
+        self.label1.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.label1.setText(self.outputfinal("create greetings"))
+        self.label1.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.label1.setStyleSheet("color: black; background-color: lightyellow;")
+
+        self.label2 = QTextEdit(self)  # untuk visual tombol fungsi
+        self.label2.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.label2.setText(self.outputfinal("create greetings"))
+        self.label2.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.label2.setStyleSheet("color: black; background-color: lightyellow;")
+
+        self.button1 = QPushButton("Grammar")
+        self.button2 = QPushButton("Paraphrase")
+        self.button3 = QPushButton("Bussines")
+        self.button4 = QPushButton("Health")
+        self.button5 = QPushButton("Education")
+        self.button6 = QPushButton("")
+        self.button7 = QPushButton("Work")
+        self.button8 = QPushButton("Study")
+        self.button9 = QPushButton("Coding")
+
+        self.open1 = QPushButton("Start")
+        self.open2 = QPushButton("Stop")
+        self.open3 = QPushButton("Close")
+        self.open4 = QPushButton("Agent")
+        self.open5 = QPushButton("Bussines")
+        self.open6 = QPushButton("RPA") 
+        self.open7 = QPushButton("Work")
+        self.open8 = QPushButton("Study")
+        self.open9 = QPushButton("Coding")
+
+        self.seleksi1 = QPushButton("Start")
+        self.seleksi2 = QPushButton("Stop")
+        self.seleksi3 = QPushButton("Close")
+        self.seleksi4 = QPushButton("Agent")
+        self.seleksi5 = QPushButton("Bussines")
+        self.seleksi6 = QPushButton("RPA")
+        self.seleksi7 = QPushButton("Work")
+        self.seleksi8 = QPushButton("Study")
+        self.seleksi9 = QPushButton("Coding")
+
+        for btn in [self.button1, self.button2, self.button3, self.button4, self.button5, self.button6, self.button7, self.button8, self.button9]:
+            btn.setFixedSize(100, 40)
+            btn.setPalette(palette)
+
+        for tombol in [self.open1, self.open2, self.open3, self.open4, self.open5, self.open6, self.open7, self.open8, self.open9]:
+            tombol.setFixedSize(100, 40)
+            tombol.setPalette(palette)
+
+        for seleksi in [self.seleksi1, self.seleksi2, self.seleksi3, self.seleksi4, self.seleksi5, self.seleksi6, self.seleksi7, self.seleksi8, self.seleksi9]:
+            seleksi.setFixedSize(100, 40)
+            seleksi.setPalette(palette)
+
+        self.open1.clicked.connect(self.granite1)
+        self.open2.clicked.connect(self.granite1)
+        self.open3.clicked.connect(self.granite1)
+        self.open4.clicked.connect(self.granite2)
+        self.open5.clicked.connect(self.granite3)
+        self.open6.clicked.connect(self.granite4)
+        self.open7.clicked.connect(self.granite5)
+        self.open8.clicked.connect(self.granite6)
+        self.open9.clicked.connect(self.granite7)
+        self.button1.clicked.connect(self.granite8)
+        self.button2.clicked.connect(self.granite9)
+        self.button3.clicked.connect(self.granite10)
+        self.button4.clicked.connect(self.granite11)
+        self.button5.clicked.connect(self.granite12)
+        self.button6.clicked.connect(self.granite13)
+        self.button7.clicked.connect(self.granite14)
+        self.button8.clicked.connect(self.granite15)
+        self.button9.clicked.connect(self.granite16)
+        self.seleksi1.clicked.connect(self.granite17)
+        self.seleksi2.clicked.connect(self.granite18)
+        self.seleksi3.clicked.connect(self.granite19)
+        self.seleksi4.clicked.connect(self.granite10)
+        self.seleksi5.clicked.connect(self.granite10)
+        self.seleksi6.clicked.connect(self.granite10)
+        self.seleksi7.clicked.connect(self.granite10)
+        self.seleksi8.clicked.connect(self.granite10)
+        self.seleksi9.clicked.connect(self.granite10)
+        layouts = QHBoxLayout()
+        layouts.addWidget(self.open1)
+        layouts.addWidget(self.open2)
+        layouts.addWidget(self.open3)
+        layouts.addWidget(self.open4)
+        layouts.addWidget(self.open5)
+        layouts.addWidget(self.open6)
+        layouts.addWidget(self.open7)
+        layouts.addWidget(self.open8)
+        layouts.addWidget(self.open9)
+
+        layoutseleksi = QHBoxLayout()
+        layoutseleksi.addWidget(self.seleksi1)
+        layoutseleksi.addWidget(self.seleksi2)
+        layoutseleksi.addWidget(self.seleksi3)
+        layoutseleksi.addWidget(self.seleksi4)
+        layoutseleksi.addWidget(self.seleksi5)
+        layoutseleksi.addWidget(self.seleksi6)
+        layoutseleksi.addWidget(self.seleksi7)
+        layoutseleksi.addWidget(self.seleksi8)
+        layoutseleksi.addWidget(self.seleksi9)
+
+        buttons_layout = QHBoxLayout()
+        buttons_layout.addWidget(self.button1)
+        buttons_layout.addWidget(self.button2)
+        buttons_layout.addWidget(self.button3)
+        buttons_layout.addWidget(self.button4)
+        buttons_layout.addWidget(self.button5)
+        buttons_layout.addWidget(self.button6)
+        buttons_layout.addWidget(self.button7)
+        buttons_layout.addWidget(self.button8)
+        buttons_layout.addWidget(self.button9)
+
+        bottom_layout = QVBoxLayout()
+        bottom_layout.addLayout(buttons_layout)
+        bottom_layout.addLayout(layouts)
+        bottom_layout.addLayout(layoutseleksi)
+
+        GUI = QHBoxLayout()
+        GUI.addWidget(self.label, stretch=1)
+        GUI.addWidget(self.label1, stretch=2)
+        GUI.addWidget(self.label2, stretch=3)
+        main_layout = QVBoxLayout()
+        main_layout.addLayout(GUI)
+        main_layout.addLayout(bottom_layout)
+
+        widget = QWidget()
+        widget.setLayout(main_layout)
+        self.setCentralWidget(widget)
+
+    def initialize_watsonx_model(self):
+        settingai = {
+            GenParams.MIN_NEW_TOKENS: 1000,
+            GenParams.MAX_NEW_TOKENS: 2000,
+            GenParams.TEMPERATURE: 1,
+            GenParams.TOP_K: 1,
+            GenParams.TOP_P: 1,
+            GenParams.REPETITION_PENALTY: 1,
+            GenParams.STOP_SEQUENCES: []
+        }
+        models = ChatWatsonx(
+            model_id="meta-llama/llama-3-2-90b-vision-instruct",
+            project_id="c42ca0dc-6bda-46ab-bd77-554199053e02",
+            apikey="xIVXm2Ho1d007WRU-44BcOj8UbeGzNxoF2EL9QUrHjjz",
+            url="https://us-south.ml.cloud.ibm.com",
+            params=settingai
+        )
+        return models
+    
+    def load_image_as_base64(self,path):
+        with open(path, "rb") as image_file:
+             image_base64 = base64.b64encode(image_file.read()).decode("utf-8")
+        return image_base64
+    
+    def construct_message(image_data, prompt_text, system_message="you is ai super", image_format="png"):
+        message = HumanMessage(
+            content=[
+                  {"type": "text", "text": prompt_text},
+                  {"type": "image_url", "image_url": {"url": f"data:image/{image_format};base64,{image_data}"}}
+            ]
+        )
+        if system_message:
+           sys_message = SystemMessage(content=system_message)
+           return [sys_message, message]
+        return [message]
+    
+    def visionai(self,prompt):
+        settingai = {
+            GenParams.MAX_NEW_TOKENS: 1000,
+            GenParams.TEMPERATURE: 1,
+            GenParams.MIN_NEW_TOKENS: 1000
+        }
+        models = ModelInference(
+            model_id= "meta-llama/llama-3-2-90b-vision-instruct",
+            credentials=Credentials(
+                api_key="xIVXm2Ho1d007WRU-44BcOj8UbeGzNxoF2EL9QUrHjjz",
+                url="https://us-south.ml.cloud.ibm.com",
+            ),
+            project_id="4ecf3586-b09f-4b9c-9167-fbb6ce3afbc8",
+            params= settingai
+        )
+        messages = self.construct_message("read", "you is ai", "png")
+        generated_response = models.chat(messages, settingai)
+        output = generated_response['choices'][0]['message']['content']
+        return output
+    
+    def chat_with_image(self,model, image, prompt, system_message=""):
+        image_format = "png"
+        if isinstance(image, str) and image.lower().endswith((".jpeg", ".jpg")):
+           image_format = "jpeg"
+           image_data = self.pick_image
+        message = self.construct_message(image_data, prompt, system_message, image_format)
+        response = model.invoke(message)
+        return response.content
+    
+    def outputfinal(self,prompt):
+        settingai = {
+            GenParams.MAX_NEW_TOKENS: 1000,
+            GenParams.TEMPERATURE: 1,
+            GenParams.MIN_NEW_TOKENS: 1000
+        }
+        models = ModelInference(
+            model_id= ModelTypes.GRANITE_20B_CODE_INSTRUCT,
+            credentials=Credentials(
+                api_key="xIVXm2Ho1d007WRU-44BcOj8UbeGzNxoF2EL9QUrHjjz",
+                url="https://us-south.ml.cloud.ibm.com",
+            ),
+            project_id="4ecf3586-b09f-4b9c-9167-fbb6ce3afbc8",
+            params= settingai
+        )
+        messages = [
+                 {"role": "system", "content": "You are a helpful assistant."},
+                 {"role": "user", "content": prompt}
+        ]
+        generated_response = models.chat(messages, settingai)
+        output = generated_response['choices'][0]['message']['content']
+        return output
+    
+    def agenutama(self):
+        models = self.initialize_watsonx_model
+        prompt = "read"
+        image = self.pick_image
+        response = self.chat_with_image(models,image=image, prompt=prompt)
+        self.label1.text += response
+    
+    def granite1(self):
+        input = self.label.toPlainText() + "Generate A "
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite2(self):
+        input = self.label1.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite3(self):
+        input = self.label.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite4(self):
+        input = self.label1.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite5(self):
+        input = self.label1.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite6(self):
+        input = self.label1.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite7(self):
+        input = self.label.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite8(self):
+        input = self.label.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite9(self):
+        input = self.label.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite10(self):
+        input = self.label1.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite11(self):
+        input = self.label.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite12(self):
+        input = self.label.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite13(self):
+        input = self.label.toPlainText() + ""#jangan jangan dulu tanda plus ini diadopsi untuk agent agent ai
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite14(self):
+        input = self.label.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite15(self):
+        input = self.label.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite16(self):
+        input = self.label.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite17(self):
+        input = self.label.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite18(self):
+        input = self.label.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+    def granite19(self):
+        input = self.label.toPlainText() + ""
+        response = self.outputfinal(prompt=input)
+        self.label2.text += response
+        self.label2.setTextFormat(Qt.TextFormat.RichText)
+
+if __name__ == "__main__":
+    app = QApplication()
+    w = Window()
+    w.show()
+    sys.exit(app.exec())
